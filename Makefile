@@ -12,7 +12,7 @@ ISO = system.iso
 ISO_DIR = iso
 BOOT_DIR = $(ISO_DIR)/boot
 GRUB_DIR = $(BOOT_DIR)/grub
-OBJS = boot.o kernel.o system.o memory.o fs.o
+OBJS = boot.o kernel.o system.o memory.o fs.o idt.o pit.o
 
 .PHONY: all clean iso dirs
 
@@ -40,6 +40,12 @@ memory.o: ./memory.c
 
 fs.o: ./fs.c
 	$(CC) $(CFLAGS) -c ./fs.c -o fs.o
+
+idt.o: ./idt.c ./idt.h
+	$(CC) $(CFLAGS) -c ./idt.c -o idt.o
+
+pit.o: ./pit.c ./pit.h
+	$(CC) $(CFLAGS) -c ./pit.c -o pit.o
 
 $(GRUB_DIR)/grub.cfg: | dirs
 	@test -f $(GRUB_DIR)/grub.cfg
