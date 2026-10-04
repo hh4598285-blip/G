@@ -41,13 +41,6 @@ jobs:
           cp kernel.bin system-kernel.bin
           ls -lh system.iso system-kernel.bin
 
-      - name: Build Windows edition
-        if: success()
-        shell: pwsh
-        run: |
-          gcc -O2 -s -mwindows windows/gos_win.c -o GOS-Windows.exe -luser32 -lgdi32 -lshell32 -lpsapi
-          if (!(Test-Path GOS-Windows.exe)) { throw "GOS-Windows.exe was not created" }
-
       - name: Upload system.iso
         uses: actions/upload-artifact@v4
         with:
