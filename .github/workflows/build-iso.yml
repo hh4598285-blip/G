@@ -34,11 +34,19 @@ jobs:
           test -f system.iso
           file system.iso
           test -s system.iso
+          grub-file --is-x86-multiboot kernel.bin
+
+      - name: Collect build outputs
+        run: |
+          cp kernel.bin system-kernel.bin
+          ls -lh system.iso system-kernel.bin
 
       - name: Upload system.iso
         uses: actions/upload-artifact@v4
         with:
           name: system-iso
-          path: system.iso
+          path: |
+            system.iso
+            system-kernel.bin
           if-no-files-found: error
           retention-days: 30
