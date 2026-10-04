@@ -1,6 +1,7 @@
 #include "keyboard.h"
 #include "system.h"
 #include "fs.h"
+#include "ata.h"
 #include <stddef.h>
 
 #define VGA ((volatile uint16_t*)0xB8000)
@@ -88,6 +89,7 @@ static void cmd_help(void){
     system_print(" touch NAME - create file\n");
     system_print(" write NAME TEXT - write text\n");
     system_print(" cat NAME - display file\n");
+    system_print(" disk - show ATA disk status\n");
 }
 
 static void cmd_files(void){
@@ -127,6 +129,13 @@ static void execute(char*line){
         return;
     }
     if(eq(cmd,"files")){cmd_files();return;}
+    if(eq(cmd,"disk")){
+        if(!ata_present()){system_print("ATA: no supported disk detected\n");return;}
+        system_print("ATA: disk online\n");
+        system_print("Model: ");system_print(ata_model());system_print("\n");
+        system_print("Sectors: ");print_uint(ata_sectors());system_print("\n");
+        return;
+    }
     if(eq(cmd,"touch")){
         char*name=next_word(&cursor);
         if(!name[0]){system_print("touch: missing name\n");return;}
