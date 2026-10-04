@@ -1,0 +1,44 @@
+name: Build OS ISO
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DEBIAN_FRONTEND: noninteractive
+
+jobs:
+  build-iso:
+    name: Build system.iso
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc nasm grub-pc-bin grub-common xorriso make
+
+      - name: Build ISO
+        run: make clean all
+
+      - name: Verify ISO
+        run: |
+          test -f system.iso
+          file system.iso
+          test -s system.iso
+
+      - name: Upload system.iso
+        uses: actions/upload-artifact@v4
+        with:
+          name: system-iso
+          path: system.iso
+          if-no-files-found: error
+          retention-days: 30
