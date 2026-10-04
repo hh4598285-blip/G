@@ -41,5 +41,4 @@ iso: $(ISO)
 
 clean:
 	rm -f boot.o kernel.o $(KERNEL) $(ISO)
-	rm -rf $(ISO_DIR)/boot
-	mkdir -p $(GRUB_DIR)
+	rm -rf $(ISO_DIR)/boot/kernel.bin
