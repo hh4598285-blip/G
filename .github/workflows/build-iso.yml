@@ -37,6 +37,8 @@ jobs:
           grub-file --is-x86-multiboot kernel.bin
           xorriso -indev system.iso -find /EFI -type d -print
           xorriso -indev system.iso -find /EFI/BOOT -type f -print
+          test -f iso/EFI/BOOT/BOOTX64.EFI
+          test -s iso/EFI/BOOT/BOOTX64.EFI
 
       - name: Collect build outputs
         run: |
