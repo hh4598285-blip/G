@@ -27,7 +27,7 @@ $(ISO): $(KERNEL) $(GRUB_DIR)/grub.cfg $(EFI_DIR)/BOOTX64.EFI
 
 $(EFI_DIR)/BOOTX64.EFI: $(GRUB_DIR)/grub.cfg | dirs
 	mkdir -p $(EFI_DIR)
-	$(GRUB_MKSTANDALONE) -O x86_64-efi -o $@ "boot/grub/grub.cfg=$(GRUB_DIR)/grub.cfg"
+	$(GRUB_MKSTANDALONE) -O x86_64-efi --modules="multiboot all_video" -o $@ "boot/grub/grub.cfg=$(GRUB_DIR)/grub.cfg"
 
 $(KERNEL): $(OBJS) linker.ld
 	$(LD) $(LDFLAGS) -o $(KERNEL) $(OBJS)
