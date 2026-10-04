@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
+extern void system_poll(void);
+
 #define MULTIBOOT_BOOTLOADER_MAGIC 0x2BADB002u
 #define MULTIBOOT_INFO_FRAMEBUFFER 0x00001000u
 
@@ -380,6 +382,7 @@ void kmain(uint32_t magic, uint32_t mbi_addr) {
     draw_cursor();
 
     for (;;) {
+        system_poll();
         mouse_poll();
         __asm__ volatile("hlt");
     }
