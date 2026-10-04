@@ -90,8 +90,8 @@ void system_poll(void){
     if(sc&0x80)return;
     if(sc==0x1C){shell_command();return;}
     if(sc==0x0E){put('\b');return;}
-    char c=translate(sc);
-    if(c)put(c);
+    char translated=translate(sc);
+    if(translated)put(translated);
 }
 
 uint32_t system_ticks(void){return ticks;}
