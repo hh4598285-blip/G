@@ -24,8 +24,14 @@ void keyboard_irq(void){
  if(!(inb(KBD_STATUS)&1u))return; uint8_t sc=inb(KBD_DATA);
  if(sc==0x2A||sc==0x36){shift=1;return;} if(sc==0xAA||sc==0xB6){shift=0;return;}
  if(sc==0x3A){caps^=1u;return;} if(sc&0x80u)return;
- if(sc<128){char c=(shift||caps)?shift_map[sc]:normal_map[sc];
-  if(shift&&caps&&sc>=0x10&&sc<=0x19)c=normal_map[sc]; if(c){push(c);++keys;}}
+ if(sc<128){
+  char c=normal_map[sc];
+  int letter=(sc>=0x10&&sc<=0x19)||(sc>=0x1E&&sc<=0x26)||(sc>=0x2C&&sc<=0x32);
+  if(shift)c=shift_map[sc];
+  if(caps&&letter)c=shift_map[sc];
+  if(shift&&caps&&letter)c=normal_map[sc];
+  if(c){push(c);++keys;}
+ }
 }
 int keyboard_read(char*out){if(tail==head)return 0;*out=buffer[tail];tail=(tail+1)%BUFFER_SIZE;return 1;}
 uint32_t keyboard_key_count(void){return keys;}
