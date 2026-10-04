@@ -1,7 +1,7 @@
 #include "keyboard.h"
 #include "system.h"
 #include "fs.h"
-#include "ata.h"
+#include "block.h"
 #include <stddef.h>
 
 #define VGA ((volatile uint16_t*)0xB8000)
@@ -52,11 +52,6 @@ static int eq(const char*a,const char*b){
     return *a==*b;
 }
 
-static int starts(const char*a,const char*b){
-    while(*b){if(*a++!=*b++)return 0;}
-    return 1;
-}
-
 static char* skip_spaces(char*p){
     while(*p==' '||*p=='\t')++p;
     return p;
@@ -85,11 +80,11 @@ static void cmd_help(void){
     system_print(" clear - clear console\n");
     system_print(" ver   - system version\n");
     system_print(" mem   - free heap memory\n");
-    system_print(" files - list files\n");
-    system_print(" touch NAME - create file\n");
-    system_print(" write NAME TEXT - write text\n");
-    system_print(" cat NAME - display file\n");
-    system_print(" disk - show ATA disk status\n");
+    system_print(" files - list RAM files\n");
+    system_print(" touch NAME - create RAM file\n");
+    system_print(" write NAME TEXT - write RAM file\n");
+    system_print(" cat NAME - display RAM file\n");
+    system_print(" disk - show block device status\n");
 }
 
 static void cmd_files(void){
@@ -130,10 +125,11 @@ static void execute(char*line){
     }
     if(eq(cmd,"files")){cmd_files();return;}
     if(eq(cmd,"disk")){
-        if(!ata_present()){system_print("ATA: no supported disk detected\n");return;}
-        system_print("ATA: disk online\n");
-        system_print("Model: ");system_print(ata_model());system_print("\n");
-        system_print("Sectors: ");print_uint(ata_sectors());system_print("\n");
+        if(!block_present()){system_print("BLOCK: no supported disk detected\n");return;}
+        system_print("BLOCK: online\n");
+        system_print("Model: ");system_print(block_model());system_print("\n");
+        system_print("Sectors: ");print_uint(block_sector_count());system_print("\n");
+        system_print("Sector size: 512 bytes\n");
         return;
     }
     if(eq(cmd,"touch")){
@@ -151,7 +147,7 @@ static void execute(char*line){
         if(id<0){system_print("write: cannot create file\n");return;}
         uint32_t n=0;while(cursor[n]&&n<4096)n++;
         if(fs_write(id,cursor,n)<0)system_print("write: write error\n");
-        else system_print("written ");print_uint(n);system_print(" bytes\n");
+        else {system_print("written ");print_uint(n);system_print(" bytes\n");}
         return;
     }
     if(eq(cmd,"cat")){
@@ -175,6 +171,7 @@ void system_init(void){
     system_print("Kernel services online.\n");
     system_print("Keyboard service online.\n");
     system_print("Filesystem service online.\n");
+    system_print("Block device layer online.\n");
     system_print("Type help for commands.\n\n");
     prompt();
 }
