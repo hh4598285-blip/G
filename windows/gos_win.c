@@ -158,7 +158,7 @@ static LRESULT CALLBACK WndProc(HWND h,UINT m,WPARAM w,LPARAM l) {
     return DefWindowProcW(h,m,w,l);
 }
 
-int WINAPI wWinMain(HINSTANCE inst,HINSTANCE prev,PWSTR cmdline,int show) {
+int WINAPI WinMain(HINSTANCE inst,HINSTANCE prev,LPSTR cmdline,int show) {
     (void)prev;(void)cmdline;
     WNDCLASSEXW wc={sizeof(wc)}; wc.lpfnWndProc=WndProc; wc.hInstance=inst; wc.lpszClassName=L"GOSWinClass";
     wc.hCursor=LoadCursor(NULL,IDC_ARROW); wc.hbrBackground=(HBRUSH)(COLOR_WINDOW+1);
