@@ -7,11 +7,9 @@ multiboot_header:
     dd 0x00000007
     dd -(0x1BADB002 + 0x00000007)
     dd 0
-    dd 0
-    dd 0
-    dd 0
-    dd 0
-    dd 0
+    dd 1024
+    dd 768
+    dd 32
 
 section .text
 align 16
