@@ -76,6 +76,11 @@ void system_init(void){
 
 void system_poll(void){
     ticks++;
+    char c;
+    if (keyboard_read(&c)) {
+        put(c);
+        return;
+    }
     if(!(inb(0x64)&1))return;
     uint8_t sc=inb(0x60);
     if(sc==0x2A||sc==0x36){shift=1;return;}
