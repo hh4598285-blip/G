@@ -21,6 +21,8 @@ extern irq_dispatch
 extern memory_init
 extern fs_init
 extern system_init
+extern idt_init
+extern pit_init
 
 _start:
     cli
@@ -29,6 +31,10 @@ _start:
     call memory_init
     call fs_init
     call system_init
+    call idt_init
+    push dword 100
+    call pit_init
+    add esp, 4
     push ebx
     push eax
     call kmain
