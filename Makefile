@@ -28,8 +28,8 @@ $(KERNEL): boot.o kernel.o linker.ld
 boot.o: boot.asm
 	$(AS) $(ASFLAGS) boot.asm -o boot.o
 
-kernel.o: kernel.c
-	$(CC) $(CFLAGS) -c kernel.c -o kernel.o
+kernel.o: ./kernel.c
+	$(CC) $(CFLAGS) -c ./kernel.c -o kernel.o
 
 $(GRUB_DIR)/grub.cfg: | dirs
 	@test -f $(GRUB_DIR)/grub.cfg
@@ -41,4 +41,4 @@ iso: $(ISO)
 
 clean:
 	rm -f boot.o kernel.o $(KERNEL) $(ISO)
-	rm -rf $(ISO_DIR)/boot/kernel.bin
+	rm -f $(ISO_DIR)/boot/kernel.bin
