@@ -35,6 +35,7 @@ _start:
     push dword 100
     call pit_init
     add esp, 4
+    sti
     push ebx
     push eax
     call kmain
