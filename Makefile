@@ -14,7 +14,7 @@ ISO_DIR = iso
 BOOT_DIR = $(ISO_DIR)/boot
 GRUB_DIR = $(BOOT_DIR)/grub
 EFI_DIR = $(ISO_DIR)/EFI/BOOT
-OBJS = boot.o kernel.o system.o memory.o fs.o ata.o idt.o pit.o keyboard.o
+OBJS = boot.o kernel.o system.o memory.o fs.o ata.o block.o idt.o pit.o keyboard.o
 
 .PHONY: all clean iso dirs efi
 
@@ -38,7 +38,7 @@ boot.o: boot.asm
 kernel.o: ./kernel.c
 	$(CC) $(CFLAGS) -c ./kernel.c -o kernel.o
 
-system.o: ./system.c ./system.h ./fs.h ./keyboard.h
+system.o: ./system.c ./system.h ./fs.h ./keyboard.h ./block.h
 	$(CC) $(CFLAGS) -c ./system.c -o system.o
 
 memory.o: ./memory.c
@@ -49,6 +49,9 @@ fs.o: ./fs.c ./fs.h
 
 ata.o: ./ata.c ./ata.h
 	$(CC) $(CFLAGS) -c ./ata.c -o ata.o
+
+block.o: ./block.c ./block.h ./ata.h
+	$(CC) $(CFLAGS) -c ./block.c -o block.o
 
 idt.o: ./idt.c ./idt.h ./keyboard.h
 	$(CC) $(CFLAGS) -c ./idt.c -o idt.o
