@@ -1,0 +1,53 @@
+name: Build GOS Windows Edition
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'windows/**'
+      - '.github/workflows/build-windows.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Build native Windows executable
+        shell: pwsh
+        run: |
+          gcc --version
+          gcc -O2 -s -mwindows windows/gos_win.c -o GOS-Windows.exe -luser32 -lgdi32 -lshell32 -lpsapi
+          if (!(Test-Path GOS-Windows.exe)) { throw "GOS-Windows.exe was not created" }
+          Get-Item GOS-Windows.exe | Format-List Name,Length
+
+      - name: Package portable edition
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Copy-Item GOS-Windows.exe dist/GOS-Windows.exe
+          @'
+          GOS Windows Edition
+          Portable native Win32 build.
+          No Node.js, npm, Python or internet connection is required.
+          F1 = Terminal
+          F2 = File Explorer
+          F10 = Exit
+          '@ | Set-Content dist/README.txt
+          Compress-Archive -Path dist/* -DestinationPath GOS-Windows-Portable.zip -Force
+          Get-Item GOS-Windows-Portable.zip | Format-List Name,Length
+
+      - name: Upload Windows EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: GOS-Windows-Portable
+          path: |
+            GOS-Windows.exe
+            GOS-Windows-Portable.zip
+          if-no-files-found: error
+          retention-days: 30
