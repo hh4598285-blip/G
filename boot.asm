@@ -15,11 +15,19 @@ section .text
 align 16
 global _start
 extern kmain
+extern system_init
+extern memory_init
+extern fs_init
 
 _start:
     cli
     mov esp, stack_top
     xor ebp, ebp
+
+    call memory_init
+    call fs_init
+    call system_init
+
     push ebx
     push eax
     call kmain
