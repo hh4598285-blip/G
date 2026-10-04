@@ -1,3 +1,4 @@
+#include "keyboard.h"
 #include "system.h"
 
 #define VGA ((volatile uint16_t*)0xB8000)
