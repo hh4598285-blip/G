@@ -12,6 +12,7 @@ ISO = system.iso
 ISO_DIR = iso
 BOOT_DIR = $(ISO_DIR)/boot
 GRUB_DIR = $(BOOT_DIR)/grub
+OBJS = boot.o kernel.o system.o memory.o fs.o
 
 .PHONY: all clean iso dirs
 
@@ -22,14 +23,23 @@ $(ISO): $(KERNEL) $(GRUB_DIR)/grub.cfg
 	cp $(KERNEL) $(BOOT_DIR)/kernel.bin
 	$(GRUB_MKRESCUE) -o $(ISO) $(ISO_DIR)
 
-$(KERNEL): boot.o kernel.o linker.ld
-	$(LD) $(LDFLAGS) -o $(KERNEL) boot.o kernel.o
+$(KERNEL): $(OBJS) linker.ld
+	$(LD) $(LDFLAGS) -o $(KERNEL) $(OBJS)
 
 boot.o: boot.asm
 	$(AS) $(ASFLAGS) boot.asm -o boot.o
 
 kernel.o: ./kernel.c
 	$(CC) $(CFLAGS) -c ./kernel.c -o kernel.o
+
+system.o: ./system.c ./system.h
+	$(CC) $(CFLAGS) -c ./system.c -o system.o
+
+memory.o: ./memory.c
+	$(CC) $(CFLAGS) -c ./memory.c -o memory.o
+
+fs.o: ./fs.c
+	$(CC) $(CFLAGS) -c ./fs.c -o fs.o
 
 $(GRUB_DIR)/grub.cfg: | dirs
 	@test -f $(GRUB_DIR)/grub.cfg
@@ -40,5 +50,5 @@ dirs:
 iso: $(ISO)
 
 clean:
-	rm -f boot.o kernel.o $(KERNEL) $(ISO)
+	rm -f $(OBJS) $(KERNEL) $(ISO)
 	rm -f $(ISO_DIR)/boot/kernel.bin
