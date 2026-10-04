@@ -27,21 +27,39 @@ jobs:
           sudo apt-get install -y gcc nasm grub-pc-bin grub-efi-amd64-bin grub-common xorriso make mtools
 
       - name: Build ISO
-        run: make clean all
-
-      - name: Verify BIOS and UEFI ISO
         run: |
-          test -f system.iso
+          set -eux
+          make clean all
+
+      - name: Verify kernel
+        run: |
+          set -eux
+          test -s kernel.bin
+          grub-file --is-x86-multiboot kernel.bin
+
+      - name: Verify ISO image
+        run: |
+          set -eux
           test -s system.iso
           file system.iso
-          grub-file --is-x86-multiboot kernel.bin
-          xorriso -indev system.iso -find /EFI -type d -print
-          xorriso -indev system.iso -find /EFI/BOOT -type f -print
-          test -f iso/EFI/BOOT/BOOTX64.EFI
+          xorriso -indev system.iso -find /boot -type f -print | tee iso-files.txt
+          grep -q '/boot/kernel.bin' iso-files.txt
+
+      - name: Verify UEFI boot image
+        run: |
+          set -eux
           test -s iso/EFI/BOOT/BOOTX64.EFI
+          xorriso -indev system.iso -find /EFI/BOOT -type f -print | tee efi-files.txt
+          grep -qi 'BOOTX64.EFI' efi-files.txt || {
+            echo "UEFI boot image was not embedded in the ISO"
+            xorriso -indev system.iso -report_el_torito plain
+            exit 1
+          }
+          xorriso -indev system.iso -report_el_torito plain
 
       - name: Collect build outputs
         run: |
+          set -eux
           cp kernel.bin system-kernel.bin
           ls -lh system.iso system-kernel.bin
 
