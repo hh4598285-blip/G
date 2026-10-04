@@ -23,7 +23,7 @@ extern fs_init
 extern system_init
 extern idt_init
 extern pit_init
-extern ata_init
+extern block_init
 
 _start:
     cli
@@ -33,7 +33,7 @@ _start:
     mov edi, ebx
     call memory_init
     call fs_init
-    call ata_init
+    call block_init
     call system_init
     call idt_init
     push dword 100
