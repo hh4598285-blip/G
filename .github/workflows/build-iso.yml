@@ -24,17 +24,19 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc nasm grub-pc-bin grub-common xorriso make mtools
+          sudo apt-get install -y gcc nasm grub-pc-bin grub-efi-amd64-bin grub-common xorriso make mtools
 
       - name: Build ISO
         run: make clean all
 
-      - name: Verify ISO
+      - name: Verify BIOS and UEFI ISO
         run: |
           test -f system.iso
-          file system.iso
           test -s system.iso
+          file system.iso
           grub-file --is-x86-multiboot kernel.bin
+          xorriso -indev system.iso -find /EFI -type d -print
+          xorriso -indev system.iso -find /EFI/BOOT -type f -print
 
       - name: Collect build outputs
         run: |
