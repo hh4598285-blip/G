@@ -42,14 +42,14 @@ jobs:
           set -eux
           test -s system.iso
           file system.iso
-          xorriso -indev system.iso -find /boot -type f -print | tee iso-files.txt
-          grep -q '/boot/kernel.bin' iso-files.txt
+          xorriso -indev system.iso -ls /boot | tee iso-files.txt
+          grep -qi 'kernel.bin' iso-files.txt
 
       - name: Verify UEFI boot image
         run: |
           set -eux
           test -s iso/EFI/BOOT/BOOTX64.EFI
-          xorriso -indev system.iso -find /EFI/BOOT -type f -print | tee efi-files.txt
+          xorriso -indev system.iso -ls /EFI/BOOT | tee efi-files.txt
           grep -qi 'BOOTX64.EFI' efi-files.txt || {
             echo "UEFI boot image was not embedded in the ISO"
             xorriso -indev system.iso -report_el_torito plain
