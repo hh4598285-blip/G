@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include "fs.h"
 #include <stddef.h>
 
 #define GOS_MAX_FILES 32
@@ -24,6 +24,7 @@ void fs_init(void){
 }
 
 int fs_create(const char*name){
+    if(!name||!name[0])return -1;
     for(uint32_t i=0;i<GOS_MAX_FILES;i++){
         if(files[i].used&&same(files[i].name,name))return -1;
     }
@@ -52,10 +53,21 @@ int fs_read(int id,void*data,uint32_t size){
 }
 
 int fs_find(const char*name){
+    if(!name)return -1;
     for(uint32_t i=0;i<GOS_MAX_FILES;i++)if(files[i].used&&same(files[i].name,name))return (int)i;
     return -1;
 }
 
 uint32_t fs_count(void){
     uint32_t n=0;for(uint32_t i=0;i<GOS_MAX_FILES;i++)if(files[i].used)n++;return n;
+}
+
+uint32_t fs_size(int id){
+    if(id<0||id>=GOS_MAX_FILES||!files[id].used)return 0;
+    return files[id].size;
+}
+
+const char* fs_name(int id){
+    if(id<0||id>=GOS_MAX_FILES||!files[id].used)return "";
+    return files[id].name;
 }
