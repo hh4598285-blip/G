@@ -2,6 +2,7 @@ CC = gcc
 AS = nasm
 LD = ld
 GRUB_MKRESCUE = grub-mkrescue
+GRUB_MKSTANDALONE = grub-mkstandalone
 
 CFLAGS = -m32 -std=gnu11 -ffreestanding -fno-pie -fno-stack-protector -fno-builtin -Wall -Wextra -O2
 LDFLAGS = -m elf_i386 -T linker.ld -nostdlib
@@ -12,16 +13,21 @@ ISO = system.iso
 ISO_DIR = iso
 BOOT_DIR = $(ISO_DIR)/boot
 GRUB_DIR = $(BOOT_DIR)/grub
+EFI_DIR = $(ISO_DIR)/EFI/BOOT
 OBJS = boot.o kernel.o system.o memory.o fs.o idt.o pit.o keyboard.o
 
-.PHONY: all clean iso dirs
+.PHONY: all clean iso dirs efi
 
 all: $(ISO)
 
-$(ISO): $(KERNEL) $(GRUB_DIR)/grub.cfg
+$(ISO): $(KERNEL) $(GRUB_DIR)/grub.cfg $(EFI_DIR)/BOOTX64.EFI
 	mkdir -p $(BOOT_DIR)
 	cp $(KERNEL) $(BOOT_DIR)/kernel.bin
 	$(GRUB_MKRESCUE) -o $(ISO) $(ISO_DIR)
+
+$(EFI_DIR)/BOOTX64.EFI: $(GRUB_DIR)/grub.cfg | dirs
+	mkdir -p $(EFI_DIR)
+	$(GRUB_MKSTANDALONE) -O x86_64-efi -o $@ "boot/grub/grub.cfg=$(GRUB_DIR)/grub.cfg"
 
 $(KERNEL): $(OBJS) linker.ld
 	$(LD) $(LDFLAGS) -o $(KERNEL) $(OBJS)
@@ -54,7 +60,7 @@ $(GRUB_DIR)/grub.cfg: | dirs
 	@test -f $(GRUB_DIR)/grub.cfg
 
 dirs:
-	mkdir -p $(GRUB_DIR)
+	mkdir -p $(GRUB_DIR) $(EFI_DIR)
 
 iso: $(ISO)
 
