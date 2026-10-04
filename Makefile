@@ -32,13 +32,13 @@ boot.o: boot.asm
 kernel.o: ./kernel.c
 	$(CC) $(CFLAGS) -c ./kernel.c -o kernel.o
 
-system.o: ./system.c ./system.h
+system.o: ./system.c ./system.h ./fs.h ./keyboard.h
 	$(CC) $(CFLAGS) -c ./system.c -o system.o
 
 memory.o: ./memory.c
 	$(CC) $(CFLAGS) -c ./memory.c -o memory.o
 
-fs.o: ./fs.c
+fs.o: ./fs.c ./fs.h
 	$(CC) $(CFLAGS) -c ./fs.c -o fs.o
 
 idt.o: ./idt.c ./idt.h ./keyboard.h
