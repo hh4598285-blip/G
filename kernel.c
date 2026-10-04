@@ -371,6 +371,7 @@ void kmain(uint32_t magic, uint32_t mbi_addr) {
         vga_write("Framebuffer unavailable; using VGA text mode.\n");
         vga_write("System online.\n");
         for (;;) {
+            system_poll();
             __asm__ volatile("hlt");
         }
     }
