@@ -28,6 +28,8 @@ _start:
     cli
     mov esp, stack_top
     xor ebp, ebp
+    mov esi, eax
+    mov edi, ebx
     call memory_init
     call fs_init
     call system_init
@@ -35,7 +37,8 @@ _start:
     push dword 100
     call pit_init
     add esp, 4
-    sti
+    mov eax, esi
+    mov ebx, edi
     push ebx
     push eax
     call kmain
